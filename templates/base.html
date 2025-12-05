@@ -14,8 +14,20 @@
       <nav>
         <a href="{{ url_for('item_list') }}">商品一覧</a>
         <a href="{{ url_for('movement_list') }}">履歴</a>
-      </nav>
 
+        <span style="margin-left: 20px;"></span>
+
+        {# ログイン画面ではログイン情報を出さない #}
+        {% if request.endpoint != 'login' %}
+
+          {# g.user があればログイン中 #}
+          {% if g.user %}
+            <span>ログイン中：{{ g.user["username"] }}（{{ g.user["role"] }}）</span>
+            <a href="{{ url_for('logout') }}" style="margin-left: 10px;">ログアウト</a>
+          {% endif %}
+
+        {% endif %}
+      </nav>
     </header>
 
     {% with messages = get_flashed_messages(with_categories=true) %}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, g
+from flask import Flask, render_template, request, redirect, url_for, flash, g, session
 import sqlite3
 import os
 
@@ -19,12 +19,72 @@ def get_db():
         g.db = conn
     return g.db
 
+@app.before_request
+def load_logged_in_user():
+    """リクエストごとに「今ログインしているユーザー」を g.user にセットする。"""
+    user_id = session.get("user_id")
+
+    if user_id is None:
+        g.user = None
+    else:
+        db = get_db()
+        user = db.execute(
+            "SELECT id, username, role FROM USERS WHERE id = ?",
+            (user_id,)
+        ).fetchone()
+        g.user = user
 
 @app.teardown_appcontext
 def close_db(exception):
     db = g.pop("db", None)
     if db is not None:
         db.close()
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    db = get_db()
+
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+
+        if not username or not password:
+            flash("ユーザー名とパスワードを入力してください。", "error")
+            return render_template("login.html")
+
+        # ユーザーをDBから検索
+        user = db.execute(
+            "SELECT * FROM USERS WHERE username = ?",
+            (username,)
+        ).fetchone()
+
+        if user is None:
+            flash("ユーザー名かパスワードが違います。", "error")
+            return render_template("login.html")
+
+        # いったん「password_hash に平文パスワードが入っている」前提
+        # （あとでハッシュチェックに変更する）
+        if user["password_hash"] != password:
+            flash("ユーザー名かパスワードが違います。", "error")
+            return render_template("login.html")
+
+        # ログイン成功 → セッションに保存
+        session.clear()
+        session["user_id"] = user["id"]
+        session["role"] = user["role"]
+        session["username"] = user["username"]
+
+        flash(f"ログインしました。（{user['username']}）", "success")
+        return redirect(url_for("item_list"))
+
+    # GET のときはログインフォームを表示
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("ログアウトしました。", "success")
+    return redirect(url_for("login"))
 
 
 # ====== 商品一覧 ======
