@@ -14,6 +14,7 @@
           <th>操作</th>
         </tr>
       </thead>
+
       <tbody>
         {% for item in items %}
           <tr class="{% if item.stock < item.threshold %}low-stock{% endif %}">
@@ -22,12 +23,21 @@
             <td>{{ item.category_name or "-" }}</td>
             <td>{{ item.supplier_name or "-" }}</td>
             <td>
-              <a href="{{ url_for('stock_in', item_id=item.id) }}">入庫</a> /
-              <a href="{{ url_for('stock_out', item_id=item.id) }}">出庫</a>
+              <form method="post" action="{{ url_for('update_stock') }}" style="display:inline-flex; gap:4px; align-items:center;">
 
-              {% if item.stock < item.threshold %}
-                <span class="alert-text">入庫してください</span>
-              {% endif %}
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+
+                <button type="submit" name="action" value="in">増</button>
+                <button type="submit" name="action" value="out">減</button>
+
+                <input type="number" name="quantity" value="1" min="1" style="width:60px;">
+
+                <input type="text" name="memo" placeholder="メモ" style="width:120px;">
+
+                {% if item.stock < item.threshold %}
+                  <span class="alert-text">入庫してください</span>
+                {% endif %}
+              </form>
             </td>
           </tr>
         {% endfor %}

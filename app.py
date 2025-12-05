@@ -143,64 +143,36 @@ def create_stock_movement(db, item_id, user_id, quantity_change, movement_type, 
         (quantity_change, item_id)
     )
 
-@app.route("/items/<int:item_id>/in", methods=["GET", "POST"])
-def stock_in(item_id):
+@app.route("/items/update_stock", methods=["POST"])
+def update_stock():
     db = get_db()
-    item = db.execute("SELECT * FROM ITEMS WHERE id = ?", (item_id,)).fetchone()
 
-    if not item:
-        flash("商品が存在しません。", "error")
+    item_id = int(request.form["item_id"])
+    quantity = int(request.form["quantity"])
+    memo = request.form.get("memo", "")
+    action = request.form.get("action")
+
+    user_id = 1  # 仮ユーザー（あとでログインと連動させる）
+
+    if action == "in":
+        change = quantity
+        movement_type = "IN"
+    elif action == "out":
+        change = -quantity
+        movement_type = "OUT"
+    else:
+        flash("不明な操作です。", "error")
         return redirect(url_for("item_list"))
 
-    if request.method == "POST":
-        quantity = int(request.form["quantity"])
-        memo = request.form.get("memo", "")
+    create_stock_movement(
+        db,
+        item_id=item_id,
+        user_id=user_id,
+        quantity_change=change,
+        movement_type=movement_type,
+        memo=memo,
+    )
 
-        # ★ユーザーIDは今は仮で1として登録（ログイン機能を作ったら変更）
-        user_id = 1
-
-        create_stock_movement(
-            db,
-            item_id=item_id,
-            user_id=user_id,
-            quantity_change=quantity,  # 入庫はプラス
-            movement_type="IN",
-            memo=memo,
-        )
-
-        db.commit()
-        flash("入庫処理が完了しました。", "success")
-        return redirect(url_for("item_list"))
-
-    return render_template("stock_form.html", item=item, action_name="入庫")
-
-@app.route("/items/<int:item_id>/out", methods=["GET", "POST"])
-def stock_out(item_id):
-    db = get_db()
-    item = db.execute("SELECT * FROM ITEMS WHERE id = ?", (item_id,)).fetchone()
-
-    if not item:
-        flash("商品が存在しません。", "error")
-        return redirect(url_for("item_list"))
-
-    if request.method == "POST":
-        quantity = int(request.form["quantity"])
-        memo = request.form.get("memo", "")
-
-        user_id = 1  # ★仮ユーザー（後でログインと連動）
-
-        # 出庫はマイナス
-        create_stock_movement(
-            db,
-            item_id=item_id,
-            user_id=user_id,
-            quantity_change=-quantity,
-            movement_type="OUT",
-            memo=memo,
-        )
-
-        db.commit()
-        flash("出庫処理が完了しました。", "success")
-        return redirect(url_for("item_list"))
-
-    return render_template("stock_form.html", item=item, action_name="出庫")
+    db.commit()
+    flash("在庫を更新しました。", "success")
+    return redirect(url_for("item_list"))
