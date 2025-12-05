@@ -12,6 +12,9 @@
           <th>カテゴリ</th>
           <th>仕入先</th>
           <th>操作</th>
+          {% if g.user and g.user["role"] == "admin" %}
+            <th>管理</th>
+          {% endif %}
         </tr>
       </thead>
 
@@ -39,6 +42,16 @@
                 {% endif %}
               </form>
             </td>
+
+            {% if g.user and g.user["role"] == "admin" %}
+              <td>
+                <form method="post" action="{{ url_for('item_delete', item_id=item.id) }}" style="display:inline;">
+                  <button type="submit" onclick="return confirm('{{ item.name }} を削除しますか？');">
+                    削除
+                  </button>
+                </form>
+              </td>
+            {% endif %}
           </tr>
         {% endfor %}
       </tbody>
@@ -47,67 +60,69 @@
     <p>登録されている商品はまだありません。</p>
   {% endif %}
 
-  <hr>
+  {% if g.user and g.user["role"] == "admin" %}
+    <hr>
 
-  <h3>＋ 商品登録</h3>
-  <button type="button" onclick="toggleForm()">商品登録フォームを開く / 閉じる</button>
+    <h3>＋ 商品登録</h3>
+    <button type="button" onclick="toggleForm()">商品登録フォームを開く / 閉じる</button>
 
-  <div id="register-form">
-    <form method="post" action="{{ url_for('item_create') }}">
-      <div>
-        <label>商品名（必須）</label><br>
-        <input type="text" name="name" required>
-      </div>
+    <div id="register-form">
+      <form method="post" action="{{ url_for('item_create') }}">
+        <div>
+          <label>商品名（必須）</label><br>
+          <input type="text" name="name" required>
+        </div>
 
-      <div>
-        <label>単位（必須：個・箱など）</label><br>
-        <input type="text" name="unit" required>
-      </div>
+        <div>
+          <label>単位（必須：個・箱など）</label><br>
+          <input type="text" name="unit" required>
+        </div>
 
-      <div>
-        <label>初期在庫数（任意・数字）</label><br>
-        <input type="number" name="stock" value="0">
-      </div>
+        <div>
+          <label>初期在庫数（任意・数字）</label><br>
+          <input type="number" name="stock" value="0">
+        </div>
 
-      <div>
-        <label>在庫警告のしきい値（任意・数字）</label><br>
-        <input type="number" name="threshold" value="0">
-      </div>
+        <div>
+          <label>在庫警告のしきい値（任意・数字）</label><br>
+          <input type="number" name="threshold" value="0">
+        </div>
 
-      <div>
-        <label>カテゴリ（任意）</label><br>
-        <select name="category_id">
-          <option value="">未選択</option>
-          {% for cat in categories %}
-            <option value="{{ cat.id }}">{{ cat.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
+        <div>
+          <label>カテゴリ（任意）</label><br>
+          <select name="category_id">
+            <option value="">未選択</option>
+            {% for cat in categories %}
+              <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
-      <div>
-        <label>仕入先（任意）</label><br>
-        <select name="supplier_id">
-          <option value="">未選択</option>
-          {% for sup in suppliers %}
-            <option value="{{ sup.id }}">{{ sup.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
+        <div>
+          <label>仕入先（任意）</label><br>
+          <select name="supplier_id">
+            <option value="">未選択</option>
+            {% for sup in suppliers %}
+              <option value="{{ sup.id }}">{{ sup.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
-      <br>
-      <button type="submit">登録する</button>
-      <button type="button" onclick="toggleForm()">閉じる</button>
-    </form>
-  </div>
+        <br>
+        <button type="submit">登録する</button>
+        <button type="button" onclick="toggleForm()">閉じる</button>
+      </form>
+    </div>
 
-  <script>
-    function toggleForm() {
-      const f = document.getElementById("register-form");
-      if (f.style.display === "none" || f.style.display === "") {
-        f.style.display = "block";
-      } else {
-        f.style.display = "none";
+    <script>
+      function toggleForm() {
+        const f = document.getElementById("register-form");
+        if (f.style.display === "none" || f.style.display === "") {
+          f.style.display = "block";
+        } else {
+          f.style.display = "none";
+        }
       }
-    }
-  </script>
+    </script>
+  {% endif %}
 {% endblock %}

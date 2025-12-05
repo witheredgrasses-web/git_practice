@@ -46,6 +46,25 @@ def login_required(view):
         return view(**kwargs)
     return wrapped_view
 
+def role_required(role):
+    """指定した role 以外はアクセスできないデコレータ。"""
+    def decorator(view):
+        @wraps(view)
+        def wrapped_view(**kwargs):
+            # 未ログインならログイン画面へ
+            if g.user is None:
+                flash("ログインが必要です。", "error")
+                return redirect(url_for("login"))
+
+            # ロールが違えばトップへ戻す
+            if g.user["role"] != role:
+                flash("この操作を行う権限がありません。", "error")
+                return redirect(url_for("item_list"))
+
+            return view(**kwargs)
+        return wrapped_view
+    return decorator
+
 
 @app.teardown_appcontext
 def close_db(exception):
@@ -142,8 +161,11 @@ def item_list():
         suppliers=suppliers
     )
 
+
+
 @app.route("/movements")
 @login_required
+@role_required("admin")
 def movement_list():
     db = get_db()
     movements = db.execute(
@@ -172,6 +194,7 @@ def movement_list():
 # ====== 商品登録（新規） ======
 @app.route("/items/new", methods=["POST"])
 @login_required
+@role_required("admin")
 def item_create():
     db = get_db()
 
@@ -219,6 +242,19 @@ def create_stock_movement(db, item_id, user_id, quantity_change, movement_type, 
         (quantity_change, item_id)
     )
 
+@app.route("/items/<int:item_id>/delete", methods=["POST"])
+@login_required
+@role_required("admin")
+def item_delete(item_id):
+    db = get_db()
+    db.execute(
+        "UPDATE ITEMS SET is_active = 0 WHERE id = ?",
+        (item_id,),
+    )
+    db.commit()
+    flash("商品を論理削除しました。", "info")
+    return redirect(url_for("item_list"))
+
 @app.route("/items/update_stock", methods=["POST"])
 @login_required
 def update_stock():
@@ -229,7 +265,8 @@ def update_stock():
     memo = request.form.get("memo", "")
     action = request.form.get("action")
 
-    user_id = 1  # 仮ユーザー（あとでログインと連動させる）
+    user_id = g.user["id"]
+
 
     if action == "in":
         change = quantity

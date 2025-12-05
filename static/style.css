@@ -1,66 +1,184 @@
+/* 全体レイアウト */
 body {
-  font-family: system-ui, sans-serif;
-  margin: 20px;
+  margin: 0;
+  padding: 0;
+  font-family: "Yu Gothic", "Hiragino Sans", "Meiryo", sans-serif;
+  background: #f5efe6; /* 薄いクリーム色 */
+  color: #3b2f2f;      /* コーヒーっぽい文字色 */
 }
 
+/* 画面上部のバー（base.html 側の header を想定） */
 header {
-  margin-bottom: 20px;
+  background: #5b3a29; /* ダークブラウン */
+  color: #fdf5e6;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-nav a {
-  margin-right: 10px;
+header a {
+  color: #fdf5e6;
+  text-decoration: none;
+  margin-left: 10px;
 }
 
+header a:hover {
+  text-decoration: underline;
+}
+
+/* コンテンツを少し狭めて中央に */
+main {
+  max-width: 960px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fffaf3;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 見出し */
+h2, h3 {
+  margin-top: 0;
+  color: #4a3326;
+}
+
+/* テーブル */
 table {
-  border-collapse: collapse;
   width: 100%;
-  max-width: 900px;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 14px;
 }
 
-th,
-td {
-  border: 1px solid #ccc;
-  padding: 4px 8px;
+thead {
+  background: #d8c3a5;
 }
 
-th {
-  background: #f0f0f0;
+th, td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e0d3c2;
+  text-align: left;
 }
 
-.flash {
-  padding: 8px;
-  margin-bottom: 10px;
-  border-radius: 4px;
+tbody tr:nth-child(even) {
+  background: #faf4ea;
 }
 
-.flash.error {
-  background: #ffe0e0;
-  border: 1px solid #ff8080;
+tbody tr:hover {
+  background: #f0e4d4;
 }
 
-.flash.success {
-  background: #e0ffe0;
-  border: 1px solid #80ff80;
+/* 在庫しきい値以下の行 */
+.low-stock {
+  background: #ffe5e5 !important;
 }
 
-/* 商品登録フォームのアコーディオン用 */
-#register-form {
-  display: none;
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  background: #fafafa;
-}
-
-/* 在庫がしきい値を下回った行 */
-tr.low-stock {
-  background-color: #ffe5e5;      /* 薄い赤背景 */
-}
-
-/* アラートの文字 */
-.alert-text {
-  color: #c00;
+.low-stock .alert-text {
+  color: #c0392b;
   font-weight: bold;
-  margin-left: 8px;
-  font-size: 0.9rem;
+}
+
+/* ボタン全般 */
+button {
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* 在庫増減ボタン */
+button[name="action"][value="in"] {
+  background: #2e7d32;   /* 緑 */
+  color: #ffffff;
+}
+
+button[name="action"][value="out"] {
+  background: #b71c1c;   /* 赤 */
+  color: #ffffff;
+}
+
+/* 削除ボタン */
+button.delete-btn {
+  background: #8e3200;
+  color: #fff;
+}
+
+button.delete-btn:hover {
+  background: #6f2600;
+}
+
+/* 商品登録ボタンなどの汎用ボタン */
+button.primary-btn {
+  background: #5b3a29;
+  color: #fffaf3;
+}
+
+button.primary-btn:hover {
+  background: #4a2e20;
+}
+
+/* フォームの入力 */
+input[type="text"],
+input[type="number"],
+select {
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #c7b8a4;
+  font-size: 13px;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  outline: none;
+  border-color: #a67c52;
+  box-shadow: 0 0 0 2px rgba(166, 124, 82, 0.2);
+}
+
+/* 商品登録フォームの区切り */
+#register-form {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #f9f1e7;
+  border-radius: 6px;
+  border: 1px solid #e0d3c2;
+}
+
+#register-form label {
+  font-size: 13px;
+  color: #4a3326;
+}
+
+#register-form div {
+  margin-bottom: 8px;
+}
+
+/* フラッシュメッセージ（base.html 側で ul / li などで出している前提） */
+.flash-messages {
+  margin-bottom: 10px;
+}
+
+.flash-messages li {
+  list-style: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.flash-success {
+  background: #e0f2f1;
+  color: #00695c;
+}
+
+.flash-error {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.flash-info {
+  background: #e3f2fd;
+  color: #1565c0;
 }
