@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, g, session
 import sqlite3
 import os
+from functools import wraps 
+
 
 app = Flask(__name__)
 app.secret_key = "change_this_to_random_string"  # フラッシュメッセージ用（適当に変更してOK）
@@ -33,6 +35,17 @@ def load_logged_in_user():
             (user_id,)
         ).fetchone()
         g.user = user
+
+def login_required(view):
+    """ログインしていない場合は /login にリダイレクトするデコレータ。"""
+    @wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            flash("このページを見るにはログインが必要です。", "error")
+            return redirect(url_for("login"))
+        return view(**kwargs)
+    return wrapped_view
+
 
 @app.teardown_appcontext
 def close_db(exception):
@@ -89,6 +102,7 @@ def logout():
 
 # ====== 商品一覧 ======
 @app.route("/")
+@login_required
 def item_list():
     db = get_db()
 
@@ -129,6 +143,7 @@ def item_list():
     )
 
 @app.route("/movements")
+@login_required
 def movement_list():
     db = get_db()
     movements = db.execute(
@@ -156,6 +171,7 @@ def movement_list():
 
 # ====== 商品登録（新規） ======
 @app.route("/items/new", methods=["POST"])
+@login_required
 def item_create():
     db = get_db()
 
@@ -204,6 +220,7 @@ def create_stock_movement(db, item_id, user_id, quantity_change, movement_type, 
     )
 
 @app.route("/items/update_stock", methods=["POST"])
+@login_required
 def update_stock():
     db = get_db()
 
