@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>商品を登録</h2>
+
+  <form method="post">
+    <div>
+      <label for="name">商品名（必須）</label><br />
+      <input
+        type="text"
+        id="name"
+        name="name"
+        required
+        value="{{ (form_data.name if form_data) or '' }}"
+      />
+    </div>
+
+    <div>
+      <label for="unit">単位（必須：個・箱・kg など）</label><br />
+      <input
+        type="text"
+        id="unit"
+        name="unit"
+        required
+        value="{{ (form_data.unit if form_data) or '' }}"
+      />
+    </div>
+
+    <div>
+      <label for="stock">初期在庫数（省略可・数字）</label><br />
+      <input
+        type="number"
+        id="stock"
+        name="stock"
+        value="{{ (form_data.stock if form_data) or '0' }}"
+      />
+    </div>
+
+    <div>
+      <label for="threshold">在庫警告のしきい値（省略可・数字）</label><br />
+      <input
+        type="number"
+        id="threshold"
+        name="threshold"
+        value="{{ (form_data.threshold if form_data) or '0' }}"
+      />
+    </div>
+
+    <div>
+      <label for="category_id">カテゴリ（任意）</label><br />
+      <select id="category_id" name="category_id">
+        <option value="">未選択</option>
+        {% for cat in categories %}
+          {% set selected = (form_data.category_id == cat.id|string) if form_data else false %}
+          <option value="{{ cat.id }}" {% if selected %}selected{% endif %}>
+            {{ cat.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="supplier_id">仕入先（任意）</label><br />
+      <select id="supplier_id" name="supplier_id">
+        <option value="">未選択</option>
+        {% for sup in suppliers %}
+          {% set selected = (form_data.supplier_id == sup.id|string) if form_data else false %}
+          <option value="{{ sup.id }}" {% if selected %}selected{% endif %}>
+            {{ sup.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="margin-top: 10px;">
+      <button type="submit">登録する</button>
+      <a href="{{ url_for('item_list') }}">キャンセル</a>
+    </div>
+  </form>
+{% endblock %}

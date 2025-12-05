@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>入出庫 履歴</h2>
+
+  {% if movements %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>商品名</th>
+          <th>ユーザー</th>
+          <th>数量</th>
+          <th>操作種別</th>
+          <th>メモ</th>
+          <th>日時</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in movements %}
+          <tr>
+            <td>{{ m.id }}</td>
+            <td>{{ m.item_name }}</td>
+            <td>{{ m.user_name }}</td>
+            <td>{{ m.quantity_change }}</td>
+            <td>{{ m.movement_type }}</td>
+            <td>{{ m.memo or "-" }}</td>
+            <td>{{ m.created_at }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  {% else %}
+    <p>まだ履歴がありません。</p>
+  {% endif %}
+
+{% endblock %}

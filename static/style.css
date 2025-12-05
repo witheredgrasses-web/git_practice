@@ -1,0 +1,66 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 20px;
+}
+
+header {
+  margin-bottom: 20px;
+}
+
+nav a {
+  margin-right: 10px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 900px;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+}
+
+th {
+  background: #f0f0f0;
+}
+
+.flash {
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.flash.error {
+  background: #ffe0e0;
+  border: 1px solid #ff8080;
+}
+
+.flash.success {
+  background: #e0ffe0;
+  border: 1px solid #80ff80;
+}
+
+/* 商品登録フォームのアコーディオン用 */
+#register-form {
+  display: none;
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+}
+
+/* 在庫がしきい値を下回った行 */
+tr.low-stock {
+  background-color: #ffe5e5;      /* 薄い赤背景 */
+}
+
+/* アラートの文字 */
+.alert-text {
+  color: #c00;
+  font-weight: bold;
+  margin-left: 8px;
+  font-size: 0.9rem;
+}

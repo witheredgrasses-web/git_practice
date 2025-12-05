@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>{{ action_name }}（{{ item.name }}）</h2>
+
+  <form method="post">
+    <label for="quantity">数量（数字）</label><br>
+    <input type="number" id="quantity" name="quantity" required>
+
+    <br><br>
+
+    <label for="memo">メモ（任意）</label><br>
+    <input type="text" id="memo" name="memo">
+
+    <br><br>
+
+    <button type="submit">{{ action_name }}する</button>
+    <a href="{{ url_for('item_list') }}">キャンセル</a>
+  </form>
+{% endblock %}

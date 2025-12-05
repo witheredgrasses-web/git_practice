@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>喫茶店 在庫管理</title>
+
+    <!-- 外部CSSの読み込み -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+
+  <body>
+    <header>
+      <h1>喫茶店 在庫管理</h1>
+      <nav>
+        <a href="{{ url_for('item_list') }}">商品一覧</a>
+        <a href="{{ url_for('movement_list') }}">履歴</a>
+      </nav>
+
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </body>
+</html>

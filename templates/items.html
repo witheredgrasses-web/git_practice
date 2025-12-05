@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>商品一覧</h2>
+
+  {% if items %}
+    <table>
+      <thead>
+        <tr>
+          <th>商品名</th>
+          <th>在庫数</th>
+          <th>カテゴリ</th>
+          <th>仕入先</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          <tr class="{% if item.stock < item.threshold %}low-stock{% endif %}">
+            <td>{{ item.name }}</td>
+            <td>{{ item.stock }} ({{ item.unit }})</td>
+            <td>{{ item.category_name or "-" }}</td>
+            <td>{{ item.supplier_name or "-" }}</td>
+            <td>
+              <a href="{{ url_for('stock_in', item_id=item.id) }}">入庫</a> /
+              <a href="{{ url_for('stock_out', item_id=item.id) }}">出庫</a>
+
+              {% if item.stock < item.threshold %}
+                <span class="alert-text">入庫してください</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>登録されている商品はまだありません。</p>
+  {% endif %}
+
+  <hr>
+
+  <h3>＋ 商品登録</h3>
+  <button type="button" onclick="toggleForm()">商品登録フォームを開く / 閉じる</button>
+
+  <div id="register-form">
+    <form method="post" action="{{ url_for('item_create') }}">
+      <div>
+        <label>商品名（必須）</label><br>
+        <input type="text" name="name" required>
+      </div>
+
+      <div>
+        <label>単位（必須：個・箱など）</label><br>
+        <input type="text" name="unit" required>
+      </div>
+
+      <div>
+        <label>初期在庫数（任意・数字）</label><br>
+        <input type="number" name="stock" value="0">
+      </div>
+
+      <div>
+        <label>在庫警告のしきい値（任意・数字）</label><br>
+        <input type="number" name="threshold" value="0">
+      </div>
+
+      <div>
+        <label>カテゴリ（任意）</label><br>
+        <select name="category_id">
+          <option value="">未選択</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label>仕入先（任意）</label><br>
+        <select name="supplier_id">
+          <option value="">未選択</option>
+          {% for sup in suppliers %}
+            <option value="{{ sup.id }}">{{ sup.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <br>
+      <button type="submit">登録する</button>
+      <button type="button" onclick="toggleForm()">閉じる</button>
+    </form>
+  </div>
+
+  <script>
+    function toggleForm() {
+      const f = document.getElementById("register-form");
+      if (f.style.display === "none" || f.style.display === "") {
+        f.style.display = "block";
+      } else {
+        f.style.display = "none";
+      }
+    }
+  </script>
+{% endblock %}
