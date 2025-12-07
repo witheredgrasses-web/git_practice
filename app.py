@@ -290,3 +290,7 @@ def update_stock():
     db.commit()
     flash("在庫を更新しました。", "success")
     return redirect(url_for("item_list"))
+
+if __name__ == "__main__":
+    # ローカルで動かすとき用
+    app.run(host="0.0.0.0", port=5000, debug=True)
